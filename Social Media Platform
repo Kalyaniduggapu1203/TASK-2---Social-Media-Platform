@@ -1,0 +1,256 @@
+Task -2
+
+create a basic social media platform step-by-step with all the mentioned features.
+
+Prerequisites
+
+1. Frontend: HTML, CSS, JavaScript
+
+
+2. Backend: Django (Python) or Express.js (Node.js)
+
+
+3. Database: SQLite (for Django), MongoDB (for Express), or any preferred database.
+
+
+4. Development Environment: Install VS Code, Node.js, and Python 3.x based on your choice of backend.
+
+
+
+Step 1: Setting Up the Project
+
+Using Django for Backend
+
+1. Create and Activate Virtual Environment:
+
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate  # Windows
+
+
+2. Install Django:
+
+pip install django
+
+
+3. Create Django Project:
+
+django-admin startproject social_media
+cd social_media
+python manage.py startapp core
+
+
+4. Configure Database:
+
+Update social_media/settings.py to configure the database (SQLite by default).
+
+
+
+5. Create Models in core/models.py:
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Like(models.Model):
+    post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Follow(models.Model):
+    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+6. Migrate and Create Superuser:
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+
+
+7. Setup Views and URLs:
+
+Create views for handling CRUD operations for Posts, Comments, Likes, and Follows in core/views.py.
+
+Set up urls.py to route requests to these views.
+
+
+
+
+Using Express.js for Backend
+
+1. Initialize Node.js Project:
+
+mkdir social_media_platform
+cd social_media_platform
+npm init -y
+
+
+2. Install Dependencies:
+
+npm install express mongoose bcryptjs jsonwebtoken cors
+
+
+3. Create Folder Structure:
+
+Create folders: models, routes, and controllers.
+
+
+
+4. Define Models in models/User.js:
+
+const mongoose = require("mongoose");
+
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+});
+
+module.exports = mongoose.model("User", UserSchema);
+
+
+5. Define Post, Comment, and Like Models Similarly.
+
+
+6. Create Routes and Controllers:
+
+Create routes for user authentication, posts, comments, and likes.
+
+Implement controllers to handle logic for each route.
+
+
+
+7. Setup Server in index.js:
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+mongoose.connect("mongodb://localhost:27017/social_media", { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
+
+app.listen(5000, () => console.log("Server started on port 5000"));
+
+
+
+Step 2: Frontend Setup
+
+1. Create Basic HTML Structure in index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Social Media Platform</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Social Media Platform</h1>
+    </header>
+    <main>
+        <div id="posts-container"></div>
+    </main>
+    <script src="main.js"></script>
+</body>
+</html>
+
+
+2. Create CSS Styles in styles.css:
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+}
+
+header {
+    background-color: #3b5998;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+#posts-container {
+    margin: 20px;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: white;
+    margin-bottom: 20px;
+}
+
+
+3. Implement JavaScript for Interactivity in main.js:
+
+Fetch data from the backend using fetch or axios.
+
+Render posts, comments, and likes dynamically.
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchPosts();
+});
+
+function fetchPosts() {
+  fetch("http://localhost:5000/api/posts")
+    .then(response => response.json())
+    .then(data => {
+      const postsContainer = document.getElementById("posts-container");
+      data.posts.forEach(post => {
+        const postDiv = document.createElement("div");
+        postDiv.className = "post";
+        postDiv.innerHTML = `
+          <h3>${post.user.username}</h3>
+          <p>${post.content}</p>
+          <small>${new Date(post.createdAt).toLocaleString()}</small>
+        `;
+        postsContainer.appendChild(postDiv);
+      });
+    });
+}
+
+
+
+Step 3: Testing and Deployment
+
+1. Testing:
+
+Manually test all features (registration, login, posting, commenting, liking, and following).
+
+Implement unit tests for backend routes (e.g., using pytest for Django or mocha for Node.js).
+
+
+
+2. Deployment:
+
+Deploy on a platform like Heroku (Node.js) or DigitalOcean (Django).
+
+Ensure database configurations are set for production (e.g., PostgreSQL for Django or MongoDB Atlas for Express).
+
+
+
+
+This setup covers the basic structure for a social media platform. Let me know if you need any specific code snippets or further details on a particular section!
